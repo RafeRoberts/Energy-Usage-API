@@ -1,4 +1,5 @@
-﻿using Energy_Usage_API.Reposities;
+﻿using Energy_Usage_API.Dtos;
+using Energy_Usage_API.Reposities;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -14,38 +15,71 @@ namespace Energy_Usage_API.Controllers
     public class AccountsController : ControllerBase
     {
        
-        private readonly InMemoryAccountsRepository repository;
+        private readonly IInMemoryAccountsRepository repository;
 
-        public AccountsController()
+        public AccountsController(IInMemoryAccountsRepository repository)
         {
-            repository = new InMemoryAccountsRepository();
+            this.repository = repository;
         }
         // GET: api/<AccountsController>
         [HttpGet]
-        public IEnumerable<Models.Account> GetAccounts()
+        public IEnumerable<AccountDto> GetAccounts()
         {
-            var accounts = repository.GetAccounts();
+            var accounts = repository.GetAccounts().Select( account => account.AsDto());
             return accounts;
         }
 
-        // GET api/<AccountsController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // GET api/<AccountsController>/{AccountId}
+        [HttpGet("{AccountId}")]
+        public ActionResult<AccountDto> Get(int AccountId)
         {
-            return "value";
+            var account = repository.GetAccount(AccountId);
+            if (account is null)
+            {
+                return NotFound();
+            }
+            return account.AsDto();
         }
 
         // POST api/<AccountsController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public ActionResult<AccountDto> CreateAccount(CreateAccountDto accountDto)
         {
+            Models.Account account = new()
+            {
+                Id = Guid.NewGuid(),
+                AccountId = accountDto.AccountId,
+                FirstName = accountDto.FirstName,
+                LastName = accountDto.LastName
+            };
+            repository.CreateAccount(account);
+
+            return CreatedAtAction(nameof(GetAccounts), new { id = account.Id }, account.AsDto());
         }
 
         // PUT api/<AccountsController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public ActionResult UpdateAccount(int id, UpdateAccountDto accountDto)
         {
+            var existingAccount = repository.GetAccount(id);
+            if (existingAccount is null)
+            {
+                return NotFound();
+            }
+
+            Models.Account updatedAccount = existingAccount with
+            {
+                AccountId = accountDto.AccountId,
+                FirstName = accountDto.FirstName,
+                LastName = accountDto.LastName
+            };
+
+            repository.UpdateAccount(updatedAccount);
+
+            return NoContent();
         }
+       
+            
 
         // DELETE api/<AccountsController>/5
         [HttpDelete("{id}")]

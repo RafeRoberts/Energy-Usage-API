@@ -1,3 +1,4 @@
+using Energy_Usage_API.Reposities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -31,7 +32,7 @@ namespace Energy_Usage_API
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
-
+            services.AddSingleton<IInMemoryAccountsRepository, InMemoryAccountsRepository>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

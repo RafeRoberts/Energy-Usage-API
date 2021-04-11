@@ -6,7 +6,7 @@ using System.Linq;
 namespace Energy_Usage_API.Reposities
 {
 
-    public class InMemoryAccountsRepository
+    public class InMemoryAccountsRepository : IInMemoryAccountsRepository
     {
 
 
@@ -22,9 +22,19 @@ namespace Energy_Usage_API.Reposities
             return accounts;
         }
 
-        public Account GetAccount(Guid id)
+        public Account GetAccount(int id)
         {
-            return accounts.Where(account => account.Id == id).SingleOrDefault();
+            return accounts.Where(account => account.AccountId == id).SingleOrDefault();
+        }
+
+        public void CreateAccount(Account account)
+        {
+            accounts.Add(account);
+        }
+        public void UpdateAccount(Account account)
+        {
+            var index = accounts.FindIndex(existingAccount => existingAccount.AccountId == account.AccountId);
+            accounts[index] = account;
         }
     }
 }
