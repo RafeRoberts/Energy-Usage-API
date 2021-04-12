@@ -17,6 +17,10 @@ namespace Energy_Usage_API.Reposities
             accountsCollection = database.GetCollection< Account>(collectionName);
         }
 
+        public void CreateAccount(Account account)
+        {
+            accountsCollection.InsertOne(account);
+        }
     }
 
    
