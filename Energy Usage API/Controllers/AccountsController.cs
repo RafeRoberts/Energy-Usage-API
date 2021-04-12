@@ -83,8 +83,17 @@ namespace Energy_Usage_API.Controllers
 
         // DELETE api/<AccountsController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public ActionResult DeleteAccount(int id)
         {
+            var existingAccount = repository.GetAccount(id);
+            if (existingAccount is null)
+            {
+                return NotFound();
+            }
+
+            repository.DeleteAccount(id);
+
+            return NoContent();
         }
     }
 }

@@ -36,5 +36,11 @@ namespace Energy_Usage_API.Reposities
             var index = accounts.FindIndex(existingAccount => existingAccount.AccountId == account.AccountId);
             accounts[index] = account;
         }
+        public void DeleteAccount(int id)
+        {
+            var index = accounts.FindIndex(existingAccount => existingAccount.AccountId == id);
+            accounts.RemoveAt(index);
+        }
+        
     }
 }
